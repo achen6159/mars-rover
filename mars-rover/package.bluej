@@ -2,10 +2,10 @@
 dependency1.from=Runner
 dependency1.to=Rover
 dependency1.type=UsesDependency
-editor.fx.0.height=739
-editor.fx.0.width=902
-editor.fx.0.x=866
-editor.fx.0.y=123
+editor.fx.0.height=761
+editor.fx.0.width=1058
+editor.fx.0.x=509
+editor.fx.0.y=194
 objectbench.height=92
 objectbench.width=484
 package.divider.horizontal=0.6
