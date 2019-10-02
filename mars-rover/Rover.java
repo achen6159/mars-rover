@@ -22,9 +22,10 @@ public class Rover
     
     /**
      * Constructor for objects of class Rover
+     * 
+     * @param String name Name of the rover
      */
-    public Rover(String name)
-    {
+    public Rover(String name) {
         this.name = name;
         this.x = 0;
         this.y = 0;
@@ -38,9 +39,16 @@ public class Rover
     
     /**
      * Constructor for objects of class Rover
+     * 
+     * @param String name Name of the rover
+     * @param int x  x coordinate of rover
+     * @param int y  y coordinate of rover
+     * @param dir    direction the rover is facing
+     * @param health health of rover
+     * @param homex  initial x coordinate of rover
+     * @param homey  initial y coordinate of rover
      */
-    public Rover(String name, int x, int y, int dir, int health, int homex, int homey)
-    {
+    public Rover(String name, int x, int y, int dir, int health, int homex, int homey) {
         this.name = name;
         this.x = x;
         this.y = y;
@@ -63,13 +71,13 @@ public class Rover
     private String getDirectionName(int dir){
         String direction;
         
-        if (dir == 0){
+        if (dir == 0) {
             direction = "North";
         }
-        else if (dir == 1){
+        else if (dir == 1) {
             direction = "East";
         }
-        else if (dir == 2){
+        else if (dir == 2) {
             direction = "South";
         }
         else {
@@ -87,33 +95,31 @@ public class Rover
      */
     public void move(int space) {
         if (isAlive) {
-            if (dir == 0) {
-                y = y + space;
-            }
-            else if (dir == 1) {
-                x = x  + space;
-            }
-            else if (dir == 2) {
-                y = y  - space;
-            }
-            else if (dir == 3) {
-                x = x  - space;
-            }
-            
-            System.out.println(name + " moved " + space + " spaces in the " +
-                getDirectionName(dir) + " direction and is at (" + x + ", " + y + "). ");
-            
             if (space > energy) {
                 System.out.println(name + " doesn't have enough energy to move " + space + " spaces.");
             }
-            else if (energy > 0) {
-                energy -= (1 * space);
-            }
             else {
-                isAlive = false;
+                energy -= (1 * space);
                 
-                System.out.println(name + " has no more energy and can't move any more spaces");
+                if (dir == 0) {
+                    y = y + space;
+                }
+                else if (dir == 1) {
+                    x = x  + space;
+                }
+                else if (dir == 2) {
+                    y = y  - space;
+                }
+                else if (dir == 3) {
+                    x = x  - space;
+                }
+            
+                System.out.println(name + " moved " + space + " spaces in the " +
+                getDirectionName(dir) + " direction and is at (" + x + ", " + y + "). ");
             }
+        }
+        else {
+            System.out.println(name + " is dead and can't move.");
         }
     }
     
@@ -124,44 +130,32 @@ public class Rover
      */
     public void rotate(int rotation) {
         if (isAlive) {
-            if (rotation > 0){
-                dir = dir + rotation;
-                while (dir > 3){
-                    dir = dir % 4;
-                }
+            if (energy > 2 * rotation) {
+                energy -= (2 * rotation);
                 
-                System.out.println(name + " rotated to the right " + rotation +
-                    " time(s).");
-                
-                if (energy > 0) {
-                    energy -= (2 * rotation);
-                }
-                else if (energy == 0) {
-                    isAlive = false;
+                if (rotation > 0){
+                    dir = (dir + rotation) % 4;
                     
-                    System.out.println(name + " has no more energy." + name + " can't rotate.");
+                    System.out.println(name + " rotated to the right " + rotation +
+                    " time(s).");
+                }
+                else if (rotation < 0) {
+                    dir = dir + rotation;
+                    
+                    while (dir < 0) {
+                        dir += 4;
+                    }
+                
+                    System.out.println(name + " rotated to the left " + Math.abs(rotation) +
+                    " time(s).");
                 }
             }
-        
-            else if (rotation < 0){
-                dir = dir + rotation;
-            
-                while (dir < 0) {
-                    dir += 4;
-                }
-                
-                System.out.println(name + " rotated to the left " + Math.abs(rotation) +
-                    " time(s).");
-       
-                if (energy > 0) {
-                    energy -= (2 * rotation);
-                }
-                else if (energy == 0) {
-                    isAlive = false;
-                    
-                    System.out.println(name + " has no more energy." + name + " can't rotate.");
-                }
+            else {
+                System.out.println(name + " doesn't have enough energy to rotate that many times.");
             }
+        }
+        else {
+            System.out.println(name + " is dead and can't rotate.");
         }
     }
     
@@ -173,19 +167,20 @@ public class Rover
      */
     public void teleport(int x, int y) {
         if (isAlive) {
-            x = x;
-            y = y;
-         
-            System.out.println(name + " teleported to " + "(" + x + ", " + y + ") ");
-            if (energy > 0) {
+            if (energy >= 3) {
                 energy -= 3;
-            }
-            else if (energy == 0) {
-                isAlive = false;
                 
-                System.out.println(name + " has no more energy." + name + " can't teleport to " +
-                    "(" + x + ", " + y + ").");
+                this.x = x;
+                this.y = y;
+         
+                System.out.println(name + " teleported to " + "(" + x + ", " + y + ") ");
             }
+            else {
+                System.out.println(name + " doesn't have enough energy to teleport.");
+            }
+        }
+        else {
+            System.out.println(name + " is dead and can't teleport.");
         }
     }
     
@@ -194,19 +189,24 @@ public class Rover
      */
     public void goHome(){
         if (isAlive) {
-            x = homex;
-            y = homey;
-            
-            System.out.println(name + " went back home to " +
-                "(" + x + ", " + y + ") ");
-            if (energy > 0) {
+            if (energy >= 3) {
                 energy -= 3;
+                
+                x = homex;
+                y = homey;
+            
+                System.out.println(name + " went back home to " +
+                "(" + x + ", " + y + ") ");
             }
             else if (energy == 0) {
-                isAlive = false;
-                
                 System.out.println(name + " has no more energy." + name + " can't go home.");
             }
+            else {
+                System.out.println(name + " doesn't have enough energy to go home.");
+            }
+        }
+        else {
+            System.out.println(name + " is dead and can't go home.");
         }
     }
     
@@ -220,32 +220,30 @@ public class Rover
         
         if (isAlive) {
             if (power > 0.6) {
-                if (health > 0 && energy > 0) {
-                    health -= (5 * Math.random());
+                if (health > 0 && energy >= 4) {
+                    other.health -= (5 * Math.random());
                     this.energy -= 4;
             
                     System.out.println(this.name + " slaps " + other.name + 
                         " with it's space arms and " + other.name +
-                        "has " + health + " health left.");
-                }    
-                else if (energy == 0) {
-                    isAlive = false;
-                        
-                    System.out.println(name + " has no more energy." + name + 
-                        " can't hit another rover.");
+                        " has " + other.health + " health left.");
+                }
+                else { 
+                    System.out.println(this.name + " doesn't have enough energy to slap " + other.name + ".");
                 }
                 
-                else if (health == 0){
-                    isAlive = false;
+                if (other.health == 0){
+                    other.isAlive = false;
             
                     System.out.println(other.name + " is dead now.");
                 }
             }
-            
             else {
-                System.out.println(this.name + " doesn't have enough power to hit " + other.name +
-                    ".");
+                System.out.println(this.name + " doesn't have enough power to hit " + other.name + ".");
             }
+        }
+        else {
+            System.out.println(name + " is dead and can't hit.");
         }
     }
     
@@ -256,18 +254,17 @@ public class Rover
      */
     public void kill(Rover other) {
         if (isAlive) {
-            System.out.println(this.name + " shoots " + other.name + 
-                " with it's space lasers and " + other.name + " is now dead.");
-            System.out.println(other.name + " goes \" beep... beep...\" and dies.");  
-            
-            other.isAlive = false;
-            if (energy > 0) {
-                energy -= 5;
-            }
-            else if (energy == 0) {
-                isAlive = false;
+            if (this.energy >= 5) {
+                this.energy -= 5;
                 
-                System.out.println(name + " has no more energy.");
+                System.out.println(this.name + " shoots " + other.name + 
+                                   " with it's space lasers and " + other.name + " is now dead.");
+                System.out.println(other.name + " goes \" beep... beep...\" and dies.");  
+            
+                other.isAlive = false;
+            }
+            else {
+                System.out.println(name + " doesn't have enough energy to kill " + other.name + ".");
             }
         }
         else {
@@ -275,29 +272,31 @@ public class Rover
         }
     }
     
+    // We stopped here yesterday ***************************************************************************************
     /**
      * Lets the rover take pictures.
      */
     public void takePicture() {
         if (isAlive) {
             if (numPics < memory){
-                numPics += 1;
-                
-                System.out.println(name + " took " + numPics + " pictures at (" + x + ", " + y + ") " +
-                    "and is facing " + getDirectionName(dir) + ".");
-                if (energy > 0) {
+                if (energy >= 2) {
                     energy -= (2 * numPics);
-                }
-                else if (energy == 0) {
-                    isAlive = false;
                     
-                    System.out.println(name + " has no more energy." + name + 
-                        "can't take any more pictures");
+                    numPics += 1;
+                
+                    System.out.println(name + " took " + numPics + " pictures at (" + x + ", " + y + ") " +
+                                       "and is facing " + getDirectionName(dir) + ".");
+                }
+                else {
+                    System.out.println(name + "doesn't have enough energy to take pictures.");
                 }
             }
             else {
-                System.out.println(name + " can't take any more pictures ");
+                System.out.println(name + " can't take any more pictures. Its memory is full.");
             }  
+        }
+        else {
+            System.out.println(name + " is dead and can't take pictures.");
         }
     }
     
@@ -306,32 +305,33 @@ public class Rover
      */
     public void transmitPictures() {
         if (isAlive && numPics > 0) {
-            numPics = 0;
-        
-            System.out.println(name + " sent pictures back to Earth.");
-            if (energy > 0) {
+            if (energy >= 2) {
                 energy -= 2;
-            }
-            else if (energy == 0) {
-                isAlive = false;
                 
-                System.out.println(name + " has no more energy." + name + 
-                    " can't send any pictures.");
+                numPics = 0;
+        
+                System.out.println(name + " sent pictures back to Earth.");
+            }
+            else {
+                System.out.println(name + " doesn't have enough energy to transmit pictures.");
             }
         }
-        else {
+        else if (isAlive && numPics == 0) {
             System.out.println(name + " needs to take pictures before sending them first.");
+        }
+        else {
+            System.out.println(name + " is dead and can't transmit pictures.");
         }
     }
     
     /**
      * Lets a rover recharge when its energy is low. 
      * 
-     * @param recharge The amount that recharges the rover's energy
+     * @param recharge The amount of energy added back to the rover
      */
     public void charge(int recharge) {
         if (isAlive){
-            if (recharge < 5 && recharge > 0) {
+            if (recharge <= 5 && recharge > 0) {
                 if (energy >= 5) {
                     System.out.println(name + " doesn't need a recharge.");
                }
@@ -344,6 +344,9 @@ public class Rover
             else {
                 System.out.println(name + " can't recharge that much.");
             }
+        }
+        else {
+            System.out.println(name + " is dead and can't recharge it's energy");
         }
     }
 
@@ -360,4 +363,4 @@ public class Rover
             System.out.println(name + " is dead.");
         }
     }
-}
+} 
